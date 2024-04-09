@@ -11,6 +11,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// User represents a user in the system
+type User struct {
+	ID       int
+	Username string
+}
+
 // Database represents the database connection
 type Database struct {
 	connection *sql.DB
@@ -94,4 +100,31 @@ func (d *Database) SaveUser(username, password string) error {
 	}
 
 	return nil
+}
+
+// getUser retrieves user information from the database based on the username
+func (d *Database) GetUser(username string) (*User, error) {
+	// Prepare the SQL statement to retrieve user information
+	query := `
+        SELECT id, username FROM users WHERE username=$1
+    `
+
+	// Execute the SQL query
+	row := d.connection.QueryRow(query, username)
+
+	// Initialize variables to store the retrieved user information
+	var user User
+
+	// Scan the row into the user struct
+	err := row.Scan(&user.ID, &user.Username)
+	if err != nil {
+		// If the user doesn't exist or an error occurs, return an appropriate error
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, fmt.Errorf("error retrieving user: %v", err)
+	}
+
+	// Return the retrieved user
+	return &user, nil
 }

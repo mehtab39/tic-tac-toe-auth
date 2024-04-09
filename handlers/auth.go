@@ -72,8 +72,24 @@ func SigninHandler(w http.ResponseWriter, r *http.Request) {
 
 	if authenticated {
 		// Respond with success message
+		userInfo, err := database.GetUser(user.Username)
+		if err != nil {
+			http.Error(w, "Failed to retrieve user information", http.StatusInternalServerError)
+			return
+		}
+
+		// Marshal userInfo into JSON format
+		userInfoJSON, err := json.Marshal(userInfo)
+		if err != nil {
+			http.Error(w, "Failed to marshal user information to JSON", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, "User signed in successfully")
+
+		w.Write(userInfoJSON)
 	} else {
 		// Respond with error message
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
