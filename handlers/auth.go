@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"user-service/db"
 )
 
@@ -33,6 +34,10 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	// Save user to database
 	err = database.SaveUser(user.Username, user.Password)
 	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key") {
+			http.Error(w, "Username already in use", http.StatusForbidden)
+			return
+		}
 		http.Error(w, "Failed to save user to database", http.StatusInternalServerError)
 		return
 	}

@@ -90,7 +90,7 @@ func (d *Database) SaveUser(username, password string) error {
 
 	_, err := d.connection.Exec(query, username, password)
 	if err != nil {
-		return fmt.Errorf("error saving user: %v", err)
+		return err
 	}
 
 	return nil
