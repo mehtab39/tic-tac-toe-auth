@@ -34,6 +34,8 @@ func main() {
 	http.HandleFunc("/api/game-stats", handlers.StatsHandler)
 	http.HandleFunc("/api/game-stats/", handlers.StatsHandler)
 
+	http.HandleFunc("/api/combine/user/", handlers.GetCombineUserInfo)
+
 	log.Printf("Listening to port %d", 8081)
 	http.ListenAndServe(":8081", middlewares.CORSPolicy(http.DefaultServeMux))
 }
