@@ -4,7 +4,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"user-service/db"
@@ -42,9 +41,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Respond with success message
-	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintf(w, "User signed up successfully")
+	sendUserInfo(database, w, user.Username)
 }
 
 func SigninHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,26 +69,30 @@ func SigninHandler(w http.ResponseWriter, r *http.Request) {
 
 	if authenticated {
 		// Respond with success message
-		userInfo, err := database.GetUser(user.Username)
-		if err != nil {
-			http.Error(w, "Failed to retrieve user information", http.StatusInternalServerError)
-			return
-		}
-
-		// Marshal userInfo into JSON format
-		userInfoJSON, err := json.Marshal(userInfo)
-		if err != nil {
-			http.Error(w, "Failed to marshal user information to JSON", http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-
-		w.WriteHeader(http.StatusOK)
-
-		w.Write(userInfoJSON)
+		sendUserInfo(database, w, user.Username)
 	} else {
 		// Respond with error message
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 	}
+}
+
+func sendUserInfo(database *db.Database, w http.ResponseWriter, username string) {
+	userInfo, err := database.GetUser(username)
+	if err != nil {
+		http.Error(w, "Failed to retrieve user information", http.StatusInternalServerError)
+		return
+	}
+
+	// Marshal userInfo into JSON format
+	userInfoJSON, err := json.Marshal(userInfo)
+	if err != nil {
+		http.Error(w, "Failed to marshal user information to JSON", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(http.StatusAccepted)
+
+	w.Write(userInfoJSON)
 }
