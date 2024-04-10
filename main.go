@@ -31,6 +31,8 @@ func main() {
 	// Define your routes
 	http.HandleFunc("/api/create-account", handlers.SignupHandler)
 	http.HandleFunc("/api/signin", handlers.SigninHandler)
+	http.HandleFunc("/api/game-stats", handlers.StatsHandler)
+	http.HandleFunc("/api/game-stats/", handlers.StatsHandler)
 
 	log.Printf("Listening to port %d", 8081)
 	http.ListenAndServe(":8081", middlewares.CORSPolicy(http.DefaultServeMux))

@@ -4,6 +4,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 	"user-service/db"
@@ -63,6 +64,7 @@ func SigninHandler(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	authenticated, err := database.AuthenticateUser(user.Username, user.Password)
 	if err != nil {
+		log.Printf("Failed to authenticate user %s", err.Error())
 		http.Error(w, "Failed to authenticate user", http.StatusInternalServerError)
 		return
 	}
